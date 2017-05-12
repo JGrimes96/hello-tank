@@ -29,10 +29,10 @@
         }
       }
 
-      var tank = sprite({
+      var p1tank = tank({
         context : myGameArea.canvas.getContext("2d"),
         width : 128,
-        height : 64,
+        height :64,
         image : tankChassis,
         x : 50,
         y : 50,
@@ -40,7 +40,7 @@
         ticksPerFrame: 4
       });
 
-      function sprite (options) {
+      function tank (options) {
         var that = {};
         that.frameIndex = 0;
         that.tickCount = 0;
@@ -56,11 +56,14 @@
         that.speed = 0;
         that.angle = 0;
         that.moveAngle = 0;
+        that.turretAngle = 0;
+        that.turretMoveAngle = 0;
 
         that.newPos = function() {
           that.angle += this.moveAngle * Math.PI / 180;
           that.x += that.speed * Math.sin(that.angle);
           that.y -= that.speed * Math.cos(that.angle);
+          that.turretAngle += this.turretMoveAngle * Math.PI / 180;
         }
 
         that.update = function(loop, direction) {
@@ -92,6 +95,11 @@
           that.context.rotate(that.angle);
           that.context.drawImage(that.image,that.frameIndex * that.width / that.numberOfFrames,0,that.width / that.numberOfFrames,that.height,(that.width/that.numberOfFrames) / -2,that.height / -2,that.width / that.numberOfFrames,that.height);
           that.context.restore();
+          that.context.save();
+          that.context.translate(that.x, that.y);
+          that.context.rotate(that.turretAngle);
+          that.context.drawImage(that.image, 0, 64, that.width, that.height, (that.width/2) / -2, that.height / -2, that.width, that.height);
+          that.context.restore();
         };
 
         return that;
@@ -111,35 +119,46 @@
         if (myGameArea.keys && myGameArea.keys[83]) {moveDown();}
         if (myGameArea.keys && myGameArea.keys[65]) {moveLeft();}
         if (myGameArea.keys && myGameArea.keys[68]) {moveRight();}
-        tank.newPos();
-        tank.render();
+        if (myGameArea.keys && myGameArea.keys[37]) {moveTurretLeft();}
+        if (myGameArea.keys && myGameArea.keys[39]) {moveTurretRight();}
+        p1tank.newPos();
+        p1tank.render();
       }
 
       tankChassis.addEventListener("load", updateGameArea);
 
       function moveUp() {
-        tank.speed = 1;
-        tank.update(true, "forward");
+        p1tank.speed = 1;
+        p1tank.update(true, "forward");
       }
 
       function moveDown() {
-        tank.speed = -1;
-        tank.update(true, "reverse");
+        p1tank.speed = -1;
+        p1tank.update(true, "reverse");
       }
 
       function moveLeft() {
-        tank.moveAngle = -1;
-        tank.update(true, "forward");
+        p1tank.moveAngle = -1;
+        p1tank.update(true, "forward");
       }
 
       function moveRight() {
-        tank.moveAngle = 1;
-        tank.update(true, "forward");
+        p1tank.moveAngle = 1;
+        p1tank.update(true, "forward");
+      }
+
+      function moveTurretRight() {
+        p1tank.turretMoveAngle = 1;
+      }
+
+      function moveTurretLeft() {
+        p1tank.turretMoveAngle = -1;
       }
 
       function stopMove() {
-        tank.speed = 0;
-        tank.moveAngle = 0;
+        p1tank.speed = 0;
+        p1tank.moveAngle = 0;
+        p1tank.turretMoveAngle = 0;
       }
 
     </script>
